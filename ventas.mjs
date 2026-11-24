@@ -5,6 +5,15 @@ const chile = new Intl.DateTimeFormat('en-GB',{timeZone:'America/Santiago',weekd
 export function salesAgent({db,config,saveQuote,storeVisit,interpret}) {
   db.exec(`CREATE TABLE IF NOT EXISTS sales_flow (lead_id INTEGER PRIMARY KEY REFERENCES leads(id), data TEXT NOT NULL);
     CREATE TABLE IF NOT EXISTS attachments (message_id INTEGER PRIMARY KEY REFERENCES messages(id), filename TEXT NOT NULL, mime TEXT NOT NULL, bytes BLOB NOT NULL)`);
+  // An attended handoff returns control to the agent, including on older databases.
+  const resumeFlow = `UPDATE sales_flow SET data=CASE
+    WHEN EXISTS(SELECT 1 FROM quotes WHERE quotes.lead_id=sales_flow.lead_id) THEN '{"phase":"quoted"}'
+    ELSE '{}' END WHERE json_extract(data,'$.phase')='human'`;
+  db.exec(`CREATE TRIGGER IF NOT EXISTS resume_attended_sales_flow
+    AFTER UPDATE OF attention_reason ON leads
+    WHEN OLD.attention_reason IS NOT NULL AND NEW.attention_reason IS NULL
+    BEGIN ${resumeFlow} AND lead_id=NEW.id; END;
+    ${resumeFlow} AND lead_id IN (SELECT id FROM leads WHERE attention_reason IS NULL);`);
   function available() {
     const reserved=new Set(db.prepare('SELECT starts FROM visits').all().map(row=>row.starts));
     const choices=[];
