@@ -54,9 +54,18 @@ export function salesAgent({db,config,saveQuote,storeVisit,interpret}) {
     const structured=(f.phase==='details' && text.includes('|')) ||
       (f.phase==='company' && /^particular[.! ]*$/i.test(t)) ||
       (f.phase==='schedule' && /^(?:la |opcion |el )?[1-4]\b/.test(t));
-    const parsed=structured ? null : await interpret(text,catalog,f.phase || 'inicio',quote);
-    const asksPrevious=/\b(cotizaci[oó]n|cotizado|presupuesto|pdf)\b/.test(t) && /\b(ya|tenia|tengo|anterior|antes|quedo|quedo guardad[ao]|hicieron|hiciste|era|mande|mandaron)\b/.test(t) && !/\b(nueva|otra|cambiar|modificar)\b/.test(t);
-    if(asksPrevious || parsed?.previousQuote===true){
+    const mentionsQuote=/\b(cotizacion|cotizado|presupuesto|pdf|mn-\d+)\b/.test(t);
+    const newQuote=/\b(nuev[ao]|otr[ao]|cambiar|modificar)\b/.test(t);
+    const asksPrevious=mentionsQuote && !newQuote && /\b(ya|tenia|tengo|anterior|antes|quedo|hicieron|hiciste|era|mande|mandaron|reenvia\w*)\b/.test(t);
+    const productPage=catalog.find(p=>t.includes(normalize(p.name)) && /disponibilidad y precio/.test(t));
+    if(productPage) return say(productPage.name+' cuesta '+money(productPage.price)+' CLP. '+(productPage.stock>0?'Tenemos '+productPage.stock+' unidades disponibles. ¿Cuántas necesitas?':'Por ahora está agotado.'));
+    const asksCatalog=/\b(accesorios|catalogo|productos)\b/.test(t) && /\b(consultar|ver|conocer|tienen|venden|ofrecen|busco|muestrame)\b/.test(t);
+    if(asksCatalog && !mentionsQuote && !catalog.some(p=>t.includes(p.id))){
+      const names=new Intl.ListFormat('es-CL',{type:'conjunction'}).format(catalog.map(p=>p.name));
+      return say('¡Hola! Tenemos '+names+'. ¿Cuál te interesa?');
+    }
+    const parsed=structured || asksPrevious ? null : await interpret(text,catalog,f.phase || 'inicio');
+    if(asksPrevious || (mentionsQuote && !newQuote && parsed?.previousQuote===true)){
       if(!quote) return say('Todavía no veo una cotización guardada en este chat. ¿Qué producto te interesaba?');
       const item=catalog.find(p=>p.id===quote.product_id);
       return say('Sí, aquí está tu cotización MN-'+id+': '+quote.quantity+' × '+(item?.name || quote.product_id)+', por '+money(quote.quantity*quote.unit_price)+' CLP en total.');
@@ -99,7 +108,7 @@ export function salesAgent({db,config,saveQuote,storeVisit,interpret}) {
       return say('Si quieres pasar a ver los productos, dime «visita» y te envío los horarios.');
     }
     if(f.phase==='quoted' && !parsed?.product && !/nuev[ao]|otr[ao]|cambi|modific|pedido|precio|\d|kit|soporte|tapete/.test(t)){
-      return say('Tengo tu cotización guardada. ¿Quieres revisar el monto, cambiar el pedido o ver horarios?');
+      return say('Cuéntame un poco más. ¿Qué te gustaría saber?');
     }
     const matched=catalog.filter(p=>t.includes(p.id));
     let product=matched.length===1 ? matched[0].id : f.phase==='quoted' ? undefined : f.product;

@@ -39,6 +39,9 @@ async function loadStore() {
   if (phone) {
     whatsapp.href = waLink(phone, `Hola, quiero consultar por los accesorios de ${store}.`);
     whatsapp.hidden = false;
+    document.querySelector('.walkthrough').hidden = true;
+  } else {
+    document.querySelector('#channel-status').textContent = 'Tienda de ensayo. Puedes simular un mensaje más abajo.';
   }
   for (const product of catalog) {
     const card = document.createElement('article');

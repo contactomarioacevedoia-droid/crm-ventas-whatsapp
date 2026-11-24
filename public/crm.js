@@ -484,7 +484,16 @@ function selectSettingsPanel(name) {
   for (const panel of configPanels) panel.hidden = panel.dataset.settingsPanel !== name;
 }
 for (const link of configLinks) {
-  link.addEventListener('click', () => selectSettingsPanel(link.dataset.settingsLink));
+  link.addEventListener('click', async () => {
+    if (link.dataset.settingsLink === 'conexiones') {
+      if (!state) await refresh();
+      if (state.scenario) {
+        location.assign(by('#link-real').href);
+        return;
+      }
+    }
+    selectSettingsPanel(link.dataset.settingsLink);
+  });
 }
 configForm.addEventListener('invalid', event => {
   const panel = event.target.closest('[data-settings-panel]');
@@ -593,6 +602,7 @@ try {
   }
   await refresh();
   await showLink();
+  if (new URLSearchParams(location.search).has('conexiones')) selectSettingsPanel('conexiones');
   const contact = Number(new URL(location.href).searchParams.get('contacto'));
   if (contact) await showLead(contact);
   setInterval(() => {
