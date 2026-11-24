@@ -2,6 +2,8 @@
 
 Mesa Norte es una tienda ficticia de accesorios de escritorio para grabar una demo. La tienda y el tablero corren en tu PC con Node.js 22.13 o superior. Desde esta carpeta, ejecuta npm ci una vez para instalar las dependencias.
 
+[Abre la guía PDF para instalar el CRM con Claude](docs/Gu%C3%ADa%20pr%C3%A1ctica%20-%20Arma%20tu%20CRM%20de%20ventas%20por%20WhatsApp.pdf). Descarga el ZIP, abre la carpeta descomprimida en Claude Code y adjunta la guía junto con el enlace de este repositorio. El primer prompt está en la página 1.
+
 ## Primera prueba desde GitHub
 
 Descarga y descomprime el ZIP del repositorio o clona el proyecto. Abre una terminal en la carpeta de package.json y ejecuta npm ci. En Windows abre Abrir ensayo.cmd. En macOS o Linux ejecuta CRM_SCENARIO=1 CRM_PORT=8782 npm start. Abre http://127.0.0.1:8782/crm para probar el historial ficticio sin credenciales. Para conectar tus cuentas sigue los pasos de abajo. GitHub distribuye el código. Para mantener el CRM activo con tu PC apagado necesitas un servidor Node con almacenamiento persistente y acceso privado al panel.

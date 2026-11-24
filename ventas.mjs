@@ -49,6 +49,23 @@ export function salesAgent({db,config,saveQuote,storeVisit,interpret}) {
       if(!f.slots.length) return human('Necesita coordinar un horario.');
       await say('¿Qué horario te acomoda para venir? Responde con el número de la opción.\n'+f.slots.map((s,i)=>(i+1)+'. '+slotLabel(s)).join('\n'),{name:'Horarios.png',mime:'image/png',bytes:await slotsPNG(f.slots)});
     }
+    const catalog=config().catalog;
+    const quote=db.prepare('SELECT product_id,quantity,unit_price FROM quotes WHERE lead_id=?').get(id);
+    const structured=(f.phase==='details' && text.includes('|')) ||
+      (f.phase==='company' && /^particular[.! ]*$/i.test(t)) ||
+      (f.phase==='schedule' && /^(?:la |opcion |el )?[1-4]\b/.test(t));
+    const parsed=structured ? null : await interpret(text,catalog,f.phase || 'inicio',quote);
+    const asksPrevious=/\b(cotizaci[oó]n|cotizado|presupuesto|pdf)\b/.test(t) && /\b(ya|tenia|tengo|anterior|antes|quedo|quedo guardad[ao]|hicieron|hiciste|era|mande|mandaron)\b/.test(t) && !/\b(nueva|otra|cambiar|modificar)\b/.test(t);
+    if(asksPrevious || parsed?.previousQuote===true){
+      if(!quote) return say('Todavía no veo una cotización guardada en este chat. ¿Qué producto te interesaba?');
+      const item=catalog.find(p=>p.id===quote.product_id);
+      return say('Sí, aquí está tu cotización MN-'+id+': '+quote.quantity+' × '+(item?.name || quote.product_id)+', por '+money(quote.quantity*quote.unit_price)+' CLP en total.');
+    }
+    const greeting=/^(hola( buenas?)?|buenas?( tardes| noches| dias)?|buenos dias|me (escuchas|lees)|estas ahi|alo|gracias)[.!?¿¡ ,]*$/.test(t.trim().replace(/^[¿¡]/,''));
+    if(greeting || parsed?.conversation===true){
+      const fallback=/escuchas|lees|ahi/.test(t) ? 'Sí, te leo. ¿En qué te puedo ayudar?' : '¡Hola! Cuéntame, ¿qué necesitas?';
+      return say(typeof parsed?.answer==='string' && parsed.answer.trim() ? parsed.answer.trim().slice(0,450) : fallback);
+    }
     if(f.phase==='schedule'){
       const choice=/^(?:la |opcion |el )?([1-4])\b/.exec(t);
       const hour=/\b(\d{1,2}):(\d{2})\b/.exec(t);
@@ -81,15 +98,13 @@ export function salesAgent({db,config,saveQuote,storeVisit,interpret}) {
       if(f.visit) return offer();
       return say('Si quieres pasar a ver los productos, dime «visita» y te envío los horarios.');
     }
-    if(f.phase==='quoted' && !/cotiz|pedido|precio|\d|kit|soporte|tapete/.test(t)){
-      return human('Consulta posterior a la cotización.');
+    if(f.phase==='quoted' && !parsed?.product && !/nuev[ao]|otr[ao]|cambi|modific|pedido|precio|\d|kit|soporte|tapete/.test(t)){
+      return say('Tengo tu cotización guardada. ¿Quieres revisar el monto, cambiar el pedido o ver horarios?');
     }
-    const catalog=config().catalog;
     const matched=catalog.filter(p=>t.includes(p.id));
-    let product=matched.length===1 ? matched[0].id : f.product;
-    let quantity=Number(t.match(/\b\d+\b/)?.[0]) || f.quantity;
+    let product=matched.length===1 ? matched[0].id : f.phase==='quoted' ? undefined : f.product;
+    let quantity=Number(t.match(/\b\d+\b/)?.[0]) || (f.phase==='quoted' ? undefined : f.quantity);
     let visit=/visita|pasar|verlo|reunion/.test(t) || f.visit;
-    const parsed=await interpret(text,catalog);
     if(parsed){
       if(parsed.human===true) return human('Solicitó hablar con ventas.');
       if(catalog.some(p=>p.id===parsed.product)) product=parsed.product;
