@@ -60,8 +60,24 @@ export function salesAgent({db,config,saveQuote,storeVisit,interpret}) {
     }
     const catalog=config().catalog;
     const quote=db.prepare('SELECT product_id,quantity,unit_price FROM quotes WHERE lead_id=?').get(id);
-    const structured=(f.phase==='details' && text.includes('|')) ||
-      (f.phase==='company' && /^particular[.! ]*$/i.test(t)) ||
+    const collecting=f.phase==='details' || f.phase==='company';
+    const privateBuyer=/^(?:(?:compro|soy|es|compra|como)\s+(?:como\s+)?)?(?:particular|para mi|a mi nombre)[.! ]*$/.test(t.trim());
+    const cleanName=value=>value.trim().replace(/^(?:me llamo|mi nombre es|soy)\s+/i,'').trim();
+    const isName=value=>value.length<=70 && /^[\p{L}][\p{L}'’ -]*$/u.test(value) &&
+      !/\b(particular|compro|quiero|necesito|precio|unidades|gracias|hola|buenas|visita|empresa|cuanto|cuesta|kit|tapete|soporte)\b/.test(normalize(value));
+    const parts=text.trim().split(/[|\n]/).map(s=>s.trim());
+    const named=cleanName(parts[0]);
+    const items=catalog.filter(p=>t.includes(p.id));
+    const units=t.match(/\b\d+\b/);
+    if(collecting && items.length===1 && units && !/[?¿]/.test(text)){
+      const qty=Number(units[0]);
+      if(qty<1 || !Number.isSafeInteger(qty)) return say('¿Cuántas unidades necesitas?');
+      if(qty>items[0].stock) return human('La cantidad solicitada supera las existencias.');
+      f.product=items[0].id;f.quantity=qty;persist();
+      return say('Anoté '+qty+' de '+items[0].name+'. '+(f.phase==='company'?'¿Para qué empresa es, o compras como particular?':'¿A qué nombre preparo la cotización?'));
+    }
+    const structured=collecting && (privateBuyer || (f.phase==='details' && isName(named)) ||
+      (f.phase==='company' && !items.length && !/[?¿]/.test(text) && parts.length===1 && /^[\p{L}\d .&'-]{1,100}$/u.test(text) && !/\b(hola|buenas|gracias|quiero|necesito|cuanto|tienen|visita|me escuchas)\b/.test(t))) ||
       (f.phase==='schedule' && /^(?:la |opcion |el )?[1-4]\b/.test(t));
     const mentionsQuote=/\b(cotizacion|cotizado|presupuesto|pdf|mn-\d+)\b/.test(t);
     const newQuote=/\b(nuev[ao]|otr[ao]|cambiar|modificar)\b/.test(t);
@@ -100,15 +116,24 @@ export function salesAgent({db,config,saveQuote,storeVisit,interpret}) {
     if(hasQuote && /^(?:(?:muchas|mil) )?gracias[.! ,]*(?:por (?:la cotizacion|el pdf))?[.! ]*$/i.test(t.trim())){
       return say('¡De nada! Si quieres coordinar una visita, escribe «visita».');
     }
-    if(f.phase==='details' || f.phase==='company'){
-      const [name,company='']=f.phase==='company' ? [f.customer,text.trim()] : text.trim().split(/[|\n]/).map(s=>s.trim());
-      if(!name || name.length>70 || company.length>100 || /[?¿]/.test(text)) return say('Escríbeme el nombre para la cotización. Si es para una empresa, agrégala después de una barra: Nombre | Empresa.');
-      f.customer=name;
-      if(!company){
-        f.phase='company';persist();
-        return say('Gracias, '+name+'. ¿Cómo se llama la empresa para la cotización? Si compras a tu nombre, escribe «particular».');
+    if(collecting){
+      if(!structured) return say(f.phase==='company'?'¿Qué empresa pongo en la cotización? También puedes decir «particular».':'¿A qué nombre preparo la cotización?');
+      if(privateBuyer) f.company='Particular';
+      else if(f.phase==='company') f.company=text.trim();
+      else {
+        if(parts.length>2 || (parts[1]?.length || 0)>100) return say('¿Me das tu nombre y, si corresponde, el de tu empresa?');
+        f.customer=named;
+        if(parts[1]) f.company=parts[1];
       }
-      f.company=company;
+      if(!f.customer || !isName(f.customer)){
+        delete f.customer;f.phase='details';persist();
+        return say('Perfecto, a título personal. ¿A qué nombre preparo la cotización?');
+      }
+      const name=f.customer;
+      if(!f.company){
+        f.phase='company';persist();
+        return say('Gracias, '+name+'. ¿Compras como particular o a nombre de una empresa?');
+      }
       try{saveQuote(lead,{product:f.product,quantity:f.quantity});}catch(e){if(!e.status)throw e;return human(e.message);}
       f.phase='quoted';persist();
       db.prepare('UPDATE leads SET name=? WHERE id=?').run(name,id);
@@ -137,6 +162,7 @@ export function salesAgent({db,config,saveQuote,storeVisit,interpret}) {
       return say('Para cotizarte, dime el producto y cuántas unidades necesitas. Tenemos '+catalog.map(p=>p.name).join(', ')+'.');
     }
     if(quantity>catalog.find(p=>p.id===product).stock) return human('La cantidad solicitada supera las existencias.');
+    if(f.phase==='quoted'){delete f.customer;delete f.company;}
     f.phase='details';persist();
     await say('Sí, tenemos '+quantity+' unidades. Te preparo el PDF. ¿A nombre de quién lo hago y para qué empresa? Puedes escribir Nombre | Empresa. Si compras para ti, indica «particular» como empresa.');
   }
