@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mesa Norte · CRM de ventas</title>
+  <link rel="stylesheet" href="/crm.css">
+  <script src="/crm.js" type="module"></script>
+</head>
+<body>
+  <svg class="icon-library" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <symbol id="i-home" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+    <symbol id="i-board" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16m6-16v16"/></symbol>
+    <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 18V6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H8l-4 4zM8 9h8m-8 4h5"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4m10-4v4M3 10h18m-13 5h2m4 0h2"/></symbol>
+    <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h16M4 17h16"/><circle cx="9" cy="7" r="2.5"/><circle cx="15" cy="17" r="2.5"/></symbol>
+    <symbol id="i-external" viewBox="0 0 24 24"><path d="M14 4h6v6m0-6-9 9m7 0v5a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 4.5 4.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><path d="m4 17 6-6 4 4 6-8m-5 0h5v5"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></symbol>
+    <symbol id="i-store" viewBox="0 0 24 24"><path d="M4 9h16l-2-5H6L4 9zm1 0v10h14V9m-8 10v-6h4v6M4 9v1a2 2 0 1 0 4 0V9m0 1a2 2 0 1 0 4 0m0 0a2 2 0 1 0 4 0m0 0a2 2 0 1 0 4 0V9"/></symbol>
+    <symbol id="i-box" viewBox="0 0 24 24"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3zm-8 4.5 8 4.5 8-4.5M12 12v9m-4-16 8 4.5"/></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8L12 3zm6 12 1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2z"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+  </svg>
+
+  <aside class="sidebar">
+    <a class="workspace" href="#resumen" aria-label="Inicio del CRM">
+      <span class="workspace-mark" aria-hidden="true">M</span>
+      <span class="workspace-label"><strong id="store">Mesa Norte</strong><small>Espacio de ventas</small></span>
+    </a>
+    <nav class="side-nav" aria-label="Secciones del CRM">
+      <a href="#resumen" data-view-link="resumen" aria-label="Resumen"><svg><use href="#i-home"/></svg><span>Resumen</span></a>
+      <a href="#te-toca" data-view-link="te-toca" aria-label="Te toca"><svg><use href="#i-check"/></svg><span>Te toca</span><span class="nav-count" id="attention-count" hidden></span></a>
+      <a href="#oportunidades" data-view-link="oportunidades" aria-label="Oportunidades"><svg><use href="#i-board"/></svg><span>Oportunidades</span></a>
+      <a href="#bandeja" data-view-link="bandeja" aria-label="Bandeja"><svg><use href="#i-chat"/></svg><span>Bandeja</span><span class="nav-count" id="inbox-count" hidden></span></a>
+      <a href="#agenda" data-view-link="agenda" aria-label="Agenda"><svg><use href="#i-calendar"/></svg><span>Agenda</span></a>
+    </nav>
+    <nav class="side-nav sidebar-bottom" aria-label="Ajustes y tienda">
+      <a href="#configuracion" data-view-link="configuracion" aria-label="Configuración"><svg><use href="#i-settings"/></svg><span>Configuración</span></a>
+      <a href="/" aria-label="Ver tienda"><svg><use href="#i-external"/></svg><span>Ver tienda</span></a>
+    </nav>
+  </aside>
+
+  <div class="app">
+    <header class="topbar">
+      <span id="top-view">Resumen</span>
+      <span class="connection"><span id="connection">Modo demostración</span></span>
+    </header>
+    <main>
+      <p class="status" id="app-status" role="status"></p>
+      <section class="view" data-view="resumen">
+        <header class="page-heading">
+          <div><h1>Resumen de ventas</h1><p id="dashboard-date"></p></div>
+          <a id="demo-link" class="primary action-link" href="http://127.0.0.1:8782/crm">Abrir ensayo con historial <svg><use href="#i-arrow"/></svg></a>
+        </header>
+        <p class="status" id="board-status" role="status"></p>
+        <div aria-label="Indicadores de ventas" class="metrics" id="metrics"></div>
+        <section class="surface panel attention-panel" id="attention-preview" hidden>
+          <header class="panel-heading"><div><h2>Te toca</h2><p>Clientes que necesitan que una persona responda.</p></div><a class="inline-link" href="#te-toca">Ver todos <svg><use href="#i-arrow"/></svg></a></header>
+          <div id="attention-recent" class="record-list"></div>
+        </section>
+        <div class="overview-grid">
+          <section class="surface panel" aria-labelledby="activity-title">
+            <header class="panel-heading"><div><h2 id="activity-title">Consultas recibidas</h2><p>Últimos 14 días</p></div><strong id="weekly-total" class="chart-total"></strong></header>
+            <div id="chart" class="chart"></div>
+          </section>
+          <section class="surface panel" aria-labelledby="distribution-title">
+            <header class="panel-heading"><div><h2 id="distribution-title">Estado de las oportunidades</h2><p>Distribución por etapa</p></div></header>
+            <div id="distribution" class="distribution"></div>
+          </section>
+        </div>
+        <section class="surface panel recent" aria-labelledby="recent-title">
+          <header class="panel-heading"><h2 id="recent-title">Conversaciones recientes</h2><a class="inline-link" href="#bandeja">Abrir bandeja <svg><use href="#i-arrow"/></svg></a></header>
+          <div id="recent" class="record-list"></div>
+        </section>
+      </section>
+
+      <section class="view" data-view="te-toca" hidden>
+        <header class="page-heading"><div><h1>Te toca</h1><p>Revisa qué necesita cada cliente y marca el caso como atendido cuando termines.</p></div></header>
+        <section class="surface panel attention-panel"><header class="panel-heading"><h2>Esperando atención</h2></header><div id="attention-list" class="record-list"></div></section>
+      </section>
+
+      <section class="view" data-view="oportunidades" hidden>
+        <header class="page-heading"><div><h1>Oportunidades</h1><p>Revisa las ventas por etapa. Abre una ficha para leer la conversación.</p></div></header>
+        <div class="board-toolbar"><label class="board-filter">Mostrar<select id="board-filter"><option value="active">Abiertas</option><option value="closed">Cerradas</option><option value="all">Todas</option></select></label><strong id="board-count"></strong><label class="search-field"><svg><use href="#i-search"/></svg><input type="search" id="search" placeholder="Buscar oportunidades" aria-label="Buscar oportunidades"></label></div>
+        <div id="board" class="board"></div>
+      </section>
+
+      <section class="view" data-view="bandeja" hidden>
+        <header class="page-heading"><div><h1>Bandeja de entrada</h1><p>Abre una conversación para revisar el historial o responder.</p></div></header>
+        <section class="surface panel"><header class="panel-heading"><h2>Conversaciones</h2><label class="search-field"><svg><use href="#i-search"/></svg><input type="search" id="inbox-search" placeholder="Buscar conversaciones" aria-label="Buscar conversaciones"></label></header><div id="inbox-list" class="record-list"></div></section>
+      </section>
+
+      <section class="view" data-view="agenda" hidden>
+        <header class="page-heading"><div><h1>Agenda</h1><p>Reuniones y demostraciones que acordaste con tus clientes. Horarios de Chile continental.</p></div></header>
+        <section class="surface panel"><header class="panel-heading"><h2>Próximas reuniones</h2></header><label>Día del horario <input type="date" id="agenda-day"></label><div id="horario"></div><div id="agenda-list" class="record-list"></div></section>
+      </section>
+
+      <section class="view settings-view" data-view="configuracion" hidden>
+        <header class="page-heading"><div><h1>Configuración</h1><p>Administra tu tienda, tu catálogo y las conexiones del CRM.</p></div></header>
+        <nav class="settings-nav" aria-label="Secciones de configuración">
+          <button type="button" data-settings-link="negocio" aria-pressed="true"><svg><use href="#i-store"/></svg>Negocio</button>
+          <button type="button" data-settings-link="catalogo" aria-pressed="false"><svg><use href="#i-box"/></svg>Catálogo</button>
+          <button type="button" data-settings-link="conexiones" aria-pressed="false"><svg><use href="#i-settings"/></svg>Conexiones</button>
+          <button type="button" data-settings-link="reportes" aria-pressed="false">Resumen diario</button>
+        </nav>
+        <section data-settings-panel="reportes" class="surface setting-card" hidden>
+          <div class="setting-fields"><h2>Resumen diario de ventas</h2>
+          <p id="report-source"></p><label>Día del cierre<select id="report-day"></select></label>
+          <pre id="report-preview"></pre><h3>Entrega por Gmail</h3>
+          <p>Envía el cierre del día anterior a la hora de Chile que elijas. El destinatario recibe el total del negocio.</p>
+          <form id="report-form"><label>Correo del destinatario<input name="recipient" type="email" placeholder="ventas@tuempresa.cl"></label>
+          <label>Hora de entrega<input name="time" type="time" required></label>
+          <label><input type="checkbox" name="enabled"> Activar correo diario</label><button>Guardar entrega</button></form>
+          <p id="report-status" role="status"></p></div></section>
+        <form id="config-form" class="settings-form">
+          <div class="settings-content" data-settings-panel="negocio">
+            <section class="surface setting-card">
+              <div class="setting-info"><span class="tile-icon"><svg><use href="#i-store"/></svg></span><div><h2>Perfil de la tienda</h2><p>Nombre que verás en la tienda y en el menú del CRM.</p></div></div>
+              <div class="setting-fields"><label>Nombre comercial<input name="store" required maxlength="60" autocomplete="organization"></label><label>Foto o logotipo <input id="logo-file" type="file" accept="image/png,image/jpeg,image/webp"></label><img class="logo-preview" id="logo-preview" alt="Vista previa del logotipo" hidden></div>
+            </section>
+          </div>
+          <div class="settings-content" data-settings-panel="catalogo" hidden>
+            <section class="surface setting-card">
+              <div class="setting-info"><span class="tile-icon"><svg><use href="#i-box"/></svg></span><div><h2>Precios y existencias</h2><p>El CRM usa estos valores al calcular una nueva cotización.</p></div></div>
+              <div id="catalog-settings" class="setting-fields"></div>
+            </section>
+          </div>
+          <div class="settings-content" data-settings-panel="conexiones" hidden>
+            <section class="surface setting-card">
+              <div class="setting-info"><span class="tile-icon green"><svg><use href="#i-chat"/></svg></span><div><h2>WhatsApp</h2><p>Recibe consultas y responde desde la ficha del contacto.</p></div><span class="pill" id="meta-status"></span></div>
+              <div class="setting-fields"><label>Número de la tienda<input name="phone" inputmode="tel" autocomplete="tel" placeholder="+56 9 1234 5678" aria-describedby="phone-help"></label><p id="phone-help" class="muted">Incluye el código de país. Este número activa el botón de WhatsApp de la tienda.</p>
+                <section><h3>Vincular con QR</h3><p>Puedes dejar vacío el número de la tienda. Para escanear, en tu teléfono abre WhatsApp → Dispositivos vinculados. El agente de ventas responde consultas comerciales entrantes por WhatsApp Web. Es una conexión no oficial.</p><button type="button" id="link-start">Mostrar QR de vinculación</button><a class="primary action-link" id="link-real" href="http://127.0.0.1:8780/crm?vincular=1#configuracion" hidden>Mostrar QR en el CRM del teléfono →</a><p id="link-status" role="status"></p><img id="link-qr" alt="QR de vinculación de WhatsApp" width="260" hidden></section>
+                <details class="connection-guide" id="guia-meta"><summary>Cómo conectar WhatsApp oficial</summary>
+                  <ol><li>Crea una app de WhatsApp en Meta. Agrega tu celular como destinatario del número de prueba.</li><li>Conecta la app al servidor. Configura el ID del número, las claves en el servidor y una URL HTTPS para que Meta avise cuando llegue un mensaje.</li><li>Envía un mensaje de prueba desde tu celular y comprueba que aparezca una ficha. Para pasar al número del negocio, verifica su titularidad con Meta y completa el registro.</li></ol>
+                  <a class="inline-link" href="https://developers.facebook.com/documentation/business-messaging/whatsapp/get-started" target="_blank" rel="noopener">Guía oficial de Meta</a>
+                </details>
+              </div>
+            </section>
+            <section class="surface setting-card">
+              <div class="setting-info"><span class="tile-icon"><svg><use href="#i-spark"/></svg></span><div><h2>OpenRouter</h2><p>Interpreta el producto, las unidades y la intención de visita en mensajes de ventas.</p></div><span class="pill" id="router-status"></span></div>
+              <div class="setting-fields"><label>Modelo<input name="model" placeholder="anthropic/… o google/…" maxlength="110" aria-describedby="model-help" spellcheck="false"></label><p id="model-help" class="muted">Usa el identificador de Claude o Gemini.</p>
+              <label>Clave temporal de OpenRouter<input id="router-key" type="password" autocomplete="off" spellcheck="false" maxlength="256"></label><p class="muted">La clave queda en memoria hasta que la quites o reinicies el CRM.</p><div class="actions"><button type="button" id="use-router-key">Activar clave temporal</button><button type="button" id="clear-router-key">Quitar clave temporal</button></div><p id="router-key-status" class="status" role="status"></p></div>
+            </section>
+          </div>
+          <footer class="settings-footer"><p class="status" id="config-status" role="status"></p><button type="submit" class="primary">Guardar cambios</button></footer>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <dialog class="drawer" id="drawer" aria-label="Ficha del contacto">
+    <header class="drawer-top"><div id="contact"></div><button class="icon-button" type="button" id="close-drawer" aria-label="Cerrar ficha"><svg><use href="#i-close"/></svg></button></header>
+    <div class="drawer-body">
+      <label>Etapa de la oportunidad<select id="stage"></select></label>
+      <form id="loss-form" class="case-note" hidden>
+        <label>¿Por qué se perdió la venta?<input name="reason" maxlength="250" required placeholder="Ej. El plazo de entrega no le servía"></label>
+        <div class="actions"><button type="submit">Guardar motivo</button><button type="button" id="cancel-loss">Cancelar</button></div>
+      </form>
+      <p id="loss-summary" class="case-note" hidden></p>
+      <section class="case-note attention-note" id="human-note" hidden>
+        <h3>Te toca</h3><p id="human-reason"></p><button type="button" id="resolve-attention">Marcar como atendido</button>
+      </section>
+      <nav class="drawer-tabs" aria-label="Secciones de la ficha">
+        <button type="button" data-drawer-link="chat" aria-pressed="true">Conversación</button>
+        <button type="button" data-drawer-link="quote" aria-pressed="false">Cotización</button>
+        <button type="button" data-drawer-link="visit" aria-pressed="false">Reunión</button>
+      </nav>
+      <section class="drawer-section" data-drawer-panel="chat">
+        <h3>Conversación</h3>
+        <div id="thread" class="thread"></div><div id="sim-customer" hidden><label>Cliente simulado<input id="customer-text" placeholder="Mensaje del cliente (opcional)" maxlength="1000"></label><button type="button" id="customer-next">Simular siguiente respuesta</button> <button type="button" id="play-customer">Reproducir cliente de prueba</button></div>
+        <form id="reply">
+          <label>Respuesta<textarea name="text" rows="3" maxlength="1000" required></textarea></label>
+          <div class="actions"><button type="submit" class="primary" id="reply-button">Guardar respuesta</button><button type="button" id="draft"><svg><use href="#i-spark"/></svg>Borrador con IA</button></div>
+        </form>
+      </section>
+      <section class="drawer-section" data-drawer-panel="quote" hidden>
+        <h3>Cotización</h3>
+        <p id="quote-total" class="muted quote-total"></p><a id="pdf-link" target="_blank" rel="noopener" hidden>Abrir cotización PDF</a>
+        <form id="quote">
+          <div class="fields"><label>Producto<select name="product"></select></label><label>Unidades<input type="number" name="quantity" value="1" min="1" step="1" required></label></div>
+          <button type="submit">Calcular y guardar</button>
+        </form>
+        <p class="muted" id="quote-closed" hidden>Si necesitas cotizar de nuevo, cambia la etapa de la oportunidad.</p>
+      </section>
+      <section class="drawer-section" data-drawer-panel="visit" hidden>
+        <h3>Agendar una reunión</h3>
+        <p class="muted">Úsalo si el cliente quiere ver el producto, coordinar un retiro con hora o conversar contigo.</p>
+        <form id="visit">
+          <div class="fields"><label>Día<input type="date" name="day" required></label><label>Hora en Chile<select name="time" required></select></label></div>
+          <p class="muted" id="visit-current">De lunes a viernes, de 10:00 a 17:30.</p>
+          <button type="submit">Agendar reunión</button>
+        </form>
+      </section>
+    </div>
+    <p class="status drawer-status" id="drawer-status" role="status"></p>
+  </dialog>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "crm-ventas-mesa-norte",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.mjs"
+  },
+  "dependencies": {
+    "baileys": "^7.0.0-rc14",
+    "nodemailer": "^10.6.1",
+    "pdfkit": "^0.21.0",
+    "pino": "^10.4.0",
+    "qrcode": "^1.5.4",
+    "sharp": "^0.35.5"
+  }
+}

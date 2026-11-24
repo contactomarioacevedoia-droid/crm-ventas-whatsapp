@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mesa Norte · Accesorios de escritorio</title>
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/tienda.js" type="module"></script>
+</head>
+<body class="store">
+  <header class="store-nav">
+    <a class="wordmark" href="/" data-brand>Mesa Norte</a>
+    <nav aria-label="Tienda"><a href="#coleccion">Colección</a><a href="/crm">Abrir CRM</a></nav>
+  </header>
+  <main class="store-main">
+    <section class="hero">
+      <div class="hero-copy">
+        <p class="eyebrow">Accesorios de escritorio</p>
+        <h1>Un buen día empieza en tu mesa.</h1>
+        <p>Elige un soporte, un tapete o un kit. Cuéntanos por WhatsApp cuántos necesitas y dónde quieres recibirlos.</p>
+        <div class="actions">
+          <a class="button primary" id="whatsapp" href="https://wa.me/" target="_blank" rel="noopener" hidden>Consultar por WhatsApp</a>
+          <button class="primary" id="try" type="button">Probar una consulta</button>
+          <a href="#coleccion" class="text-link">Ver colección</a>
+        </div>
+        <small id="channel-status">Tienda ficticia para la demo del CRM.</small>
+      </div>
+      <img src="/escritorio.jpg" alt="Escritorio de madera con soporte para notebook, teclado y tapete verde" width="1536" height="1024">
+    </section>
+    <section class="walkthrough" aria-labelledby="walkthrough-title">
+      <h2 id="walkthrough-title">Del mensaje al seguimiento</h2>
+      <ol>
+        <li><strong>Elige qué consultar</strong><span>Pregunta por precio, cantidad y despacho.</span></li>
+        <li><strong>Revisa la ficha</strong><span>El CRM guarda el mensaje para que sepas en qué quedó.</span></li>
+        <li><strong>Pide hablar con ventas</strong><span>El CRM marca que una persona debe atenderte.</span></li>
+      </ol>
+      <div class="actions"><button type="button" id="try-person">Probar «Hablar con ventas»</button><a class="text-link" href="/crm#te-toca">Ver la bandeja «Te toca»</a></div>
+    </section>
+    <section id="coleccion" class="collection">
+      <h2>La colección</h2>
+      <div id="products" class="products" aria-live="polite"></div>
+    </section>
+  </main>
+  <dialog id="demo">
+    <form id="demo-form">
+      <div class="dialog-title"><h2>Simular un mensaje</h2><button class="icon" type="button" data-close aria-label="Cerrar">×</button></div>
+      <p class="muted">Puedes editar el mensaje. La prueba crea una ficha en el CRM de tu PC.</p>
+      <label>Nombre<input name="name" maxlength="70" value="Isidora Reyes" required></label>
+      <label>Mensaje<textarea name="text" maxlength="1000" rows="3" required></textarea></label>
+      <div class="actions"><button type="submit" class="primary" value="agente">Conversar con el agente</button><button type="submit">Enviar al CRM</button><button type="button" data-close>Cancelar</button></div>
+      <p class="status" role="status" id="demo-status"></p>
+    </form>
+  </dialog>
+</body>
+</html>
